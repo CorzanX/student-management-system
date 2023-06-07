@@ -1,4 +1,4 @@
-package com.example.studentmanagementsystem.entity;
+package com.example.studentmanagementsystem.entity.login;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 

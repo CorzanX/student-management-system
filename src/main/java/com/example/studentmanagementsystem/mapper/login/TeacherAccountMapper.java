@@ -1,2 +1,9 @@
-package com.example.studentmanagementsystem.mapper;public interface TeacherAccountMapper {
+package com.example.studentmanagementsystem.mapper.login;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.studentmanagementsystem.entity.login.TeacherAccount;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface TeacherAccountMapper extends BaseMapper<TeacherAccount> {
 }

@@ -1,5 +1,7 @@
 package com.example.studentmanagementsystem.entity;
 
 public class Class {
-    S
+    String Clsno;
+    String Clsname;
+    String Mno;
 }
