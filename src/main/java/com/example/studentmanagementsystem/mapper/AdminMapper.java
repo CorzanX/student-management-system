@@ -10,39 +10,74 @@ import java.util.Map;
 
 @Mapper
 public interface AdminMapper {
-    @Select("select * from CZ_Students")
-    @Results(
-            {
-                    @Result(column = "Sno",property = "Sno"),
-                    @Result(column = "Sname",property = "Sname"),
-                    @Result(column = "Ssex",property = "Ssex"),
-                    @Result(column = "Sarea",property = "Sarea"),
-                    @Result(column = "Sage",property = "Sage"),
-                    @Result(column = "Scredits",property = "Scredits"),
-                    @Result(column = "Clsno",property = "Clsno")
-
-            }
-    )
-    List<Student> selectAllStudents();
-
-    @Select("select * from CZ_Teachers")
-    @Results(
-            {
-                    @Result(column = "Tno",property = "Tno"),
-                    @Result(column = "Tname",property = "Tname"),
-                    @Result(column = "Tsex",property = "Tsex"),
-                    @Result(column = "Tjobtitle",property = "Tjobtitle"),
-                    @Result(column = "Tphone",property = "Tphone")
-            }
-    )
-    List<Teacher> selectAllTeachers();
-
-    @Select("SELECT r.Sno, s.Sname, c.Cname, r.term, r.Tname, r.score " +
-            "FROM CZ_Reports r, CZ_Students s, CZ_Courses c " +
-            "WHERE s.Sno = r.Sno AND r.Cno = c.Cno AND r.term LIKE CONCAT(#{year}, '%')")
-    List<Map<String, Object>> getTermReports(Integer year);
 
 
 
 
+
+
+    @Select("SELECT Sno,Sname,Ssex,Sage,Sarea,Scredits,Clsname  " +
+            "FROM CZ_Students,CZ_Class " +
+            "WHERE CZ_Students.Clsno = CZ_Class.Clsno " +
+            "AND CZ_Class.Clsname LIKE CONCAT('%',#{clsname}, '%')")
+    List<Map<String, Object>> getStudentInfo(String clsname);
+
+    @Insert("INSERT INTO CZ_Students (Sno, Sname, Ssex, Sage, Sarea, Scredits, Clsno) " +
+            "VALUES (#{Sno}, #{Sname}, #{Ssex}, #{Sage}, #{Sarea}, 0, #{Clsno})")
+    int insertStudent(String Sno,String Sname,String Ssex,Integer Sage,String Sarea,String Clsno);
+
+    @Delete("DELETE FROM CZ_Students\n" +
+            "WHERE Sno = #{Sno}")
+    int deleteStudent(String Sno);
+
+    @Select("SELECT t.Tno,Tname,Tsex,Tage,Tjobtitle,Tphone,COUNT(Cno) as crs_count " +
+            "FROM CZ_Teachers t, CZ_Teacher_course tc " +
+            "WHERE t.Tno = tc.Tno  " +
+            "GROUP BY t.Tno,Tname,Tsex,Tage,Tjobtitle,Tphone ")
+    List<Map<String, Object>> getTeacherInfo();
+
+    @Insert("INSERT INTO CZ_Teachers (Tno, Tname, Tsex, Tage, Tjobtitle, Tphone) " +
+            "VALUES (#{Tno}, #{Tname}, #{Tsex}, #{Tage}, #{Tjobtitle}, #{Tphone})")
+    int insertTeacher(String Tno,String Tname,String Tsex,Integer Tage,String Tjobtitle,String Tphone);
+
+    @Select("SELECT m.Mno,m.Mname,COUNT(cls.Clsno) as cls_count " +
+            "FROM CZ_Major m, CZ_Class cls " +
+            "WHERE m.Mno = cls.Mno " +
+            "GROUP BY m.Mno,m.Mname")
+    List<Map<String, Object>> getMajorInfo();
+
+    @Insert("INSERT INTO CZ_Major (Mno, Mname) " +
+            "VALUES (#{Mno}, #{Mname})")
+    int insertMajor(String Mno,String Mname);
+
+    @Select("SELECT cls.Clsno,cls.Clsname,m.Mname,COUNT(s.sno) as stu_count " +
+            "FROM CZ_Major m, CZ_Class cls,CZ_Students s " +
+            "WHERE m.Mno = cls.Mno " +
+            "AND s.Clsno = cls.Clsno " +
+            "GROUP BY cls.Clsno,cls.Clsname,m.Mname")
+    List<Map<String, Object>> getClassInfo();
+
+    @Insert("INSERT INTO CZ_Class (Clsno, Clsname, Mno) " +
+            "VALUES (#{Clsno}, #{Clsname}, #{Mno})")
+    int insertClass(String Clsno,String Clsname,String Mno);
+
+    @Select("SELECT * FROM CZ_Courses")
+    List<Map<String, Object>> getCourseInfo();
+
+    @Insert("INSERT INTO CZ_Courses (Cno, Cname, Cterm, Cduration, Casmtd, Ccredits, Tname) " +
+            "VALUES (#{Cno}, #{Cname}, #{Cterm}, #{Cduration}, #{Casmtd}, #{Ccredits}, #{Tame})")
+    int insertCourse(String Cno,String Cname,String Cterm,Integer Cduration,String Casmtd,float Ccredits,String Tame);
+
+    @Select("SELECT s.Sno,s.Sname,c.Cname,c.Cterm,score,c.Tname " +
+            "FROM CZ_Reports r, CZ_Courses c,CZ_Students s " +
+            "WHERE r.Cno = c.Cno " +
+            "AND s.Sno = r.Sno")
+    List<Map<String, Object>> getReportInfo();
+
+    @Insert("INSERT INTO CZ_Reports(Sno,Cno,term,score,Tname) " +
+            "VALUES(#{Sno} , #{Cno}, #{term}, #{score}, #{Tname}) ")
+    int insertReport(String Sno,String Cno,String term,Integer score,String Tname);
+
+    @Update("UPDATE CZ_Admin_account SET Admpwd = #{newPassword} WHERE Admno = #{Admno}")
+    int updateAdminPassword(@Param("Admno") String Admno, @Param("newPassword") String newPassword);
 }

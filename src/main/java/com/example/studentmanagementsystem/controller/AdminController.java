@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,14 +22,109 @@ public class AdminController {
     private AdminMapper adminMapper;
 
 
-    @GetMapping("/admin/findAllStudents")
-    public List<Student> findAllStudents() {return adminMapper.selectAllStudents();}
+    @PostMapping("/admin/studentInfo")
+    public List<Map<String, Object>> getStudentInfo(@RequestBody Map<String, String> requestData){
+        String clsname = requestData.get("Clsname");
+        return adminMapper.getStudentInfo(clsname);
+    }
 
-    @GetMapping("/admin/findAllTeachers")
-    public List<Teacher> findAllTeachers() {return adminMapper.selectAllTeachers();}
+    @PostMapping("/admin/studentInsert")
+    public int insertStudent(@RequestBody Map<String,String> requestData){
+        String Sno = requestData.get("Sno");
+        String Sname = requestData.get("Sname");
+        Integer Sage = Integer.parseInt(requestData.get("Sage"));
+        String Ssex = requestData.get("Ssex");
+        String Sarea = requestData.get("Sarea");
+        String Clsno = requestData.get("Clsno");
+        return adminMapper.insertStudent(Sno,Sname,Ssex,Sage,Sarea,Clsno);
+    }
 
-    @PostMapping("/admin/findTermReports")
-    public List<Map<String, Object>> findTermReports(Integer year) {return adminMapper.getTermReports(year);}
+    @PostMapping("/admin/studentDelete")
+    public int deleteStudent(@RequestBody Map<String,String> requestData){
+        String Sno = requestData.get("Sno");
+        return adminMapper.deleteStudent(Sno);
+    }
+    @GetMapping("/admin/teacherInfo")
+    public List<Map<String, Object>> getTeacherInfo(){ return adminMapper.getTeacherInfo();}
 
+    @PostMapping("/admin/teacherInsert")
+    public int insertTeacher(@RequestBody Map<String,String> requestData){
+        String Tno = requestData.get("Tno");
+        String Tname = requestData.get("Tname");
+        Integer Tage = Integer.parseInt(requestData.get("Tage"));
+        String Tsex = requestData.get("Tsex");
+        String Tjobtitle = requestData.get("Tjobtitle");
+        String Tphone = requestData.get("Tphone");
+        return adminMapper.insertTeacher(Tno,Tname,Tsex,Tage,Tjobtitle,Tphone);
+    }
 
+    @GetMapping("/admin/majorInfo")
+    public List<Map<String, Object>> getMajorInfo(){ return adminMapper.getMajorInfo();}
+
+    @PostMapping("/admin/majorInsert")
+    public int insertMajor(@RequestBody Map<String,String> requestData){
+        String Mno = requestData.get("Mno");
+        String Mname = requestData.get("Mname");
+        return adminMapper.insertMajor(Mno,Mname);
+    }
+
+    @GetMapping("/admin/classInfo")
+    public List<Map<String,Object>> getClassInfo(){ return adminMapper.getClassInfo();}
+
+    @PostMapping("/admin/classInsert")
+    public int insertClass(@RequestBody Map<String,String> requestData){
+        String Clsno = requestData.get("Clsno");
+        String Clsname = requestData.get("Clsname");
+        String Mno = requestData.get("Mno");
+        return adminMapper.insertClass(Clsno,Clsname,Mno);
+    }
+
+    @GetMapping("/admin/courseInfo")
+    public List<Map<String, Object>> getCourseInfo(){ return adminMapper.getCourseInfo();}
+
+    @PostMapping("/admin/courseInsert")
+    public int insertCourse(@RequestBody Map<String,String> requestData){
+        String Cno = requestData.get("Cno");
+        String Cname = requestData.get("Cname");
+        String Cterm = requestData.get("Cterm");
+        Integer Cduration = Integer.parseInt( requestData.get("Cduration"));
+        String Casmtd = requestData.get("Casmtd");
+        Float Ccredits = Float.parseFloat(requestData.get("Cduration"));
+        String Tname = requestData.get("Tname");
+        return adminMapper.insertCourse(Cno,Cname,Cterm,Cduration,Casmtd,Ccredits,Tname);
+    }
+
+    @PostMapping("/admin/reportInfo")
+    public List<Map<String, Object>> getReportInfo() {return adminMapper.getReportInfo();}
+
+    @PostMapping("/admin/reportInsert")
+    public int insertReport(@RequestBody Map<String,String> requestData){
+        String Sno = requestData.get("Sno");
+        String Cno = requestData.get("Cno");
+        String term = requestData.get("term");
+        Integer score = Integer.parseInt( requestData.get("score"));
+        String Tname = requestData.get("Tname");
+        return adminMapper.insertReport(Sno,Cno,term,score,Tname);
+    }
+
+    @PostMapping("/admin/update")
+    public Map<String, Object> updateAdminPassword(@RequestBody Map<String, String> requestData) {
+        String Admno = requestData.get("Admno");
+        String newPassword = requestData.get("newPassword");
+
+        Map<String, Object> response = new HashMap<>();
+
+        // 执行更新操作
+        int updateResult = adminMapper.updateAdminPassword(Admno,newPassword);
+
+        if (updateResult > 0) {
+            response.put("success", true);
+            response.put("message", "密码更新成功");
+        } else {
+            response.put("success", false);
+            response.put("message", "密码更新失败");
+        }
+
+        return response;
+    }
 }
