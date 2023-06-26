@@ -10,12 +10,6 @@ import java.util.Map;
 
 @Mapper
 public interface AdminMapper {
-
-
-
-
-
-
     @Select("SELECT Sno,Sname,Ssex,Sage,Sarea,Scredits,Clsname  " +
             "FROM CZ_Students,CZ_Class " +
             "WHERE CZ_Students.Clsno = CZ_Class.Clsno " +
@@ -33,8 +27,9 @@ public interface AdminMapper {
     @Select("SELECT t.Tno,Tname,Tsex,Tage,Tjobtitle,Tphone,COUNT(Cno) as crs_count " +
             "FROM CZ_Teachers t, CZ_Teacher_course tc " +
             "WHERE t.Tno = tc.Tno  " +
+            "AND t.Tjobtitle LIKE CONCAT('%',#{Tjobtitle},'%') " +
             "GROUP BY t.Tno,Tname,Tsex,Tage,Tjobtitle,Tphone ")
-    List<Map<String, Object>> getTeacherInfo();
+    List<Map<String, Object>> getTeacherInfo(String Tjobtitle);
 
     @Insert("INSERT INTO CZ_Teachers (Tno, Tname, Tsex, Tage, Tjobtitle, Tphone) " +
             "VALUES (#{Tno}, #{Tname}, #{Tsex}, #{Tage}, #{Tjobtitle}, #{Tphone})")
@@ -54,15 +49,20 @@ public interface AdminMapper {
             "FROM CZ_Major m, CZ_Class cls,CZ_Students s " +
             "WHERE m.Mno = cls.Mno " +
             "AND s.Clsno = cls.Clsno " +
+            "AND m.Mname LIKE CONCAT('%',#{Mname},'%') "+
             "GROUP BY cls.Clsno,cls.Clsname,m.Mname")
-    List<Map<String, Object>> getClassInfo();
+    List<Map<String, Object>> getClassInfo(String Mname);
 
     @Insert("INSERT INTO CZ_Class (Clsno, Clsname, Mno) " +
             "VALUES (#{Clsno}, #{Clsname}, #{Mno})")
     int insertClass(String Clsno,String Clsname,String Mno);
 
-    @Select("SELECT * FROM CZ_Courses")
-    List<Map<String, Object>> getCourseInfo();
+    @Select("SELECT * FROM CZ_Courses " +
+            "WHERE Tname LIKE CONCAT('%' ,#{Tname},'%') " +
+            "AND Casmtd LIKE CONCAT('%',#{Casmtd},'%') " +
+            "AND Cterm LIKE CONCAT('%', #{Cterm},'%') "
+            )
+    List<Map<String, Object>> getCourseInfo(String Tname,String Casmtd,String Cterm);
 
     @Insert("INSERT INTO CZ_Courses (Cno, Cname, Cterm, Cduration, Casmtd, Ccredits, Tname) " +
             "VALUES (#{Cno}, #{Cname}, #{Cterm}, #{Cduration}, #{Casmtd}, #{Ccredits}, #{Tame})")
@@ -71,8 +71,12 @@ public interface AdminMapper {
     @Select("SELECT s.Sno,s.Sname,c.Cname,c.Cterm,score,c.Tname " +
             "FROM CZ_Reports r, CZ_Courses c,CZ_Students s " +
             "WHERE r.Cno = c.Cno " +
-            "AND s.Sno = r.Sno")
-    List<Map<String, Object>> getReportInfo();
+            "AND s.Sno = r.Sno " +
+            "AND s.Sno LIKE CONCAT('%',#{Sno},'%') " +
+            "AND c.Cno LIKE CONCAT('%',#{Cno},'%') " +
+            "ORDER BY ${sort}"
+            )
+    List<Map<String, Object>> getReportInfo(String Cno,String Sno,String sort);
 
     @Insert("INSERT INTO CZ_Reports(Sno,Cno,term,score,Tname) " +
             "VALUES(#{Sno} , #{Cno}, #{term}, #{score}, #{Tname}) ")

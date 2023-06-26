@@ -44,8 +44,12 @@ public class AdminController {
         String Sno = requestData.get("Sno");
         return adminMapper.deleteStudent(Sno);
     }
-    @GetMapping("/admin/teacherInfo")
-    public List<Map<String, Object>> getTeacherInfo(){ return adminMapper.getTeacherInfo();}
+    @PostMapping("/admin/teacherInfo")
+    public List<Map<String, Object>> getTeacherInfo(@RequestBody Map<String, String> requestData){
+        String Tjobtitle = requestData.get("Tjobtitle");
+
+        return adminMapper.getTeacherInfo(Tjobtitle);
+    }
 
     @PostMapping("/admin/teacherInsert")
     public int insertTeacher(@RequestBody Map<String,String> requestData){
@@ -68,8 +72,11 @@ public class AdminController {
         return adminMapper.insertMajor(Mno,Mname);
     }
 
-    @GetMapping("/admin/classInfo")
-    public List<Map<String,Object>> getClassInfo(){ return adminMapper.getClassInfo();}
+    @PostMapping("/admin/classInfo")
+    public List<Map<String,Object>> getClassInfo(@RequestBody Map<String, String> requestData){
+        String Mname = requestData.get("Mname");
+        return adminMapper.getClassInfo(Mname);
+    }
 
     @PostMapping("/admin/classInsert")
     public int insertClass(@RequestBody Map<String,String> requestData){
@@ -79,8 +86,16 @@ public class AdminController {
         return adminMapper.insertClass(Clsno,Clsname,Mno);
     }
 
-    @GetMapping("/admin/courseInfo")
-    public List<Map<String, Object>> getCourseInfo(){ return adminMapper.getCourseInfo();}
+    @PostMapping("/admin/courseInfo")
+    public List<Map<String, Object>> getCourseInfo(@RequestBody Map<String,String> requestData){
+        String Castmd = requestData.get("Castmd");
+        String Cterm = requestData.get("Cterm");
+        String Tname = requestData.get("Tname");
+        if(Cterm.equals("所有")){
+            Cterm = "";
+        }
+        return adminMapper.getCourseInfo(Tname,Castmd,Cterm);
+    }
 
     @PostMapping("/admin/courseInsert")
     public int insertCourse(@RequestBody Map<String,String> requestData){
@@ -95,7 +110,20 @@ public class AdminController {
     }
 
     @PostMapping("/admin/reportInfo")
-    public List<Map<String, Object>> getReportInfo() {return adminMapper.getReportInfo();}
+    public List<Map<String, Object>> getReportInfo(@RequestBody Map<String,String> requestData) {
+        String Cno = requestData.get("Cno");
+        String Sno = requestData.get("Sno");
+        String sort = requestData.get("sort");
+        if(sort.equals("无")){
+            sort = "s.Sno";
+        } else if (sort.equals("升序")) {
+            sort = "score";
+        } else {
+            sort = "score DESC";
+        }
+        System.out.println(sort);
+        return adminMapper.getReportInfo(Cno,Sno,sort);
+    }
 
     @PostMapping("/admin/reportInsert")
     public int insertReport(@RequestBody Map<String,String> requestData){
